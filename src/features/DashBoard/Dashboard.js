@@ -11,7 +11,7 @@ export default function DashBoard() {
   const initialData = useSelector(selectAllData);
   const Status = useSelector(selectStatus);
   const [activeStatus, setActiveStatus] = useState("all");
-  const [editData, seteditData] = useState([]);
+  const [EditableOrderId, setEditableOrderId] = useState(-1);
   const dispatch = useDispatch();
   const statusButtons = ["all", "unpaid", "processing", "shipped", "review"];
 
@@ -20,31 +20,31 @@ export default function DashBoard() {
   };
 
   const toggleEditStatus = (id) => {
-    const updatedEditData = editData.includes(id)
-      ? editData.filter((itemId) => itemId !== id)
-      : [...editData, id];
-
-    seteditData(updatedEditData);
+    if (EditableOrderId === id) {
+      setEditableOrderId(-1);
+    } else {
+      setEditableOrderId(id);
+    }
   };
 
   const handleStatusChange = (item, newStatus) => {
-    const NewData = { ...item, status: newStatus };
-    dispatch(UpdateOneDataAsync(NewData));
-    toggleEditStatus(item.id);
+    const UpdatedOrder = { ...item, status: newStatus };
+    dispatch(UpdateOneDataAsync(UpdatedOrder));
+    setEditableOrderId(-1);
   };
 
   useEffect(() => {
     dispatch(fetchAllDataAsync(activeStatus));
-  }, [dispatch, activeStatus, editData]);
+  }, [dispatch, activeStatus, EditableOrderId]);
 
   return (
     <section className="h-screen">
-      <div className="bg-white h-3/4 mt-2 m-4 border rounded-lg border-black shadow-lg shadow-black">
-        <div className="p-4 flex ">
+      <div className="bg-white h-3/4 mt-2 m-4 border rounded-lg border-black shadow-lg shadow-black w-full">
+        <div className="p-2 flex  ">
           {statusButtons.map((status, index) => (
             <button
               key={index}
-              className={`px-4 py-2 rounded mr-4 ${
+              className={`px-1 md:px-4 py-1 md:py-2 rounded mr-2 ${
                 activeStatus === status
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200"
@@ -113,7 +113,7 @@ export default function DashBoard() {
                       <td className="px-4 py-2">{item.mode}</td>
                       <td className="px-4 py-2">{item.orderDate}</td>
                       <td className="px-4 py-2">
-                        {!editData?.includes(item.id) ? (
+                        {item.id !== EditableOrderId ? (
                           <button
                             className="bg-green-500 text-white px-4 py-1 rounded"
                             onClick={() => toggleEditStatus(item.id)}
@@ -121,7 +121,7 @@ export default function DashBoard() {
                             Edit
                           </button>
                         ) : (
-                          <div>
+                          <div className="flex flex-col gap-1">
                             <select
                               value={item.status}
                               onChange={(e) =>
@@ -134,6 +134,12 @@ export default function DashBoard() {
                                 </option>
                               ))}
                             </select>
+                            <button
+                              className="bg-red-500 text-white px-2 py-1 rounded"
+                              onClick={() => toggleEditStatus(-1)}
+                            >
+                              Cancel
+                            </button>
                           </div>
                         )}
                       </td>
