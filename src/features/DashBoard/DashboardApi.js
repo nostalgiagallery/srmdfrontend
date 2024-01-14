@@ -1,6 +1,6 @@
 export function fetchAllData(sort) {
   return new Promise(async (resolve) => {
-    const response = await fetch("/data?status=" + sort);
+    const response = await fetch("/data");
     const data = await response.json();
     resolve({ data });
   });

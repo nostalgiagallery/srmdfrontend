@@ -8,8 +8,8 @@ const initialState = {
 
 export const fetchAllDataAsync = createAsyncThunk(
   "data/fetchAllData",
-  async (sort) => {
-    const response = await fetchAllData(sort);
+  async () => {
+    const response = await fetchAllData();
     // The value we return becomes the `fulfilled` action payload
     return response.data;
   }
@@ -38,16 +38,6 @@ export const dataSlice = createSlice({
         state.status = "idle";
         state.data = action.payload;
       })
-      .addCase(UpdateOneDataAsync.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(UpdateOneDataAsync.fulfilled, (state, action) => {
-        state.status = "idle";
-        const index = state.data.findIndex(
-          (item) => item.id === action.payload.id
-        );
-        state.data[index] = action.payload;
-      });
   },
 });
 
